@@ -15,20 +15,29 @@ function onStartClick() {
   }
   isActive = true;
 
+  disBtnOnStart();
+
+  intervalId = setInterval(intervalCallbackFunction, 1000);
+}
+
+function intervalCallbackFunction() {
+  const randomColor = getRandomHexColor();
+  document.body.style.backgroundColor = randomColor;
+  return isActive;
+}
+
+function disBtnOnStart() {
   refs.btnStart.disabled = true;
   refs.btnStop.disabled = false;
-
-  intervalId = setInterval(() => {
-    const randomColor = getRandomHexColor();
-    document.body.style.backgroundColor = randomColor;
-    return isActive;
-  }, 1000);
 }
 
 function onStopClick() {
   clearInterval(intervalId);
   document.body.style.backgroundColor = 'white';
   isActive = false;
+}
+
+function disBtnOnStop() {
   refs.btnStart.disabled = false;
   refs.btnStop.disabled = true;
 }
@@ -36,3 +45,4 @@ function onStopClick() {
 function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 }
+
