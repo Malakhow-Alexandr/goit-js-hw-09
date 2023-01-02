@@ -23,6 +23,7 @@ function onStartClick() {
 function intervalCallbackFunction() {
   const randomColor = getRandomHexColor();
   document.body.style.backgroundColor = randomColor;
+  isActive = true;
   return isActive;
 }
 
@@ -35,6 +36,7 @@ function onStopClick() {
   clearInterval(intervalId);
   document.body.style.backgroundColor = 'white';
   isActive = false;
+  disBtnOnStop();
 }
 
 function disBtnOnStop() {
@@ -45,4 +47,3 @@ function disBtnOnStop() {
 function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 }
-
