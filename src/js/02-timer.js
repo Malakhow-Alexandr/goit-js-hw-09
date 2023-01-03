@@ -1,6 +1,9 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
+import Notiflix from 'notiflix';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 const refs = {
   input: document.querySelector('#datetime-picker'),
   startBtn: document.querySelector('button[data-start]'),
@@ -11,6 +14,9 @@ const refs = {
 };
 
 makeDisabledBtn();
+let inervalId = null;
+let isActive = false;
+const currentDate = new Date();
 
 const options = {
   enableTime: true,
@@ -18,35 +24,46 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const currentDate = new Date();
+    
     if (selectedDates[0] < currentDate) {
       makeDisabledBtn();
-      alert('Please choose a date in the future');
+
+      Notiflix.Notify.failure('Please choose a date in the future');
+
       return;
     }
+
     takeOfDisabledBtn();
+
     const selectedTime = selectedDates[0].getTime();
 
-    refs.startBtn.addEventListener('click', onStartBtnClick(selectedTime));
+    refs.startBtn.addEventListener('click', () => {
+      if (isActive) {
+        Notiflix.Notify.info('Sorry timer started!');
+        return;
+      }
+      Notiflix.Notify.success('Date entered correctly. Timer started!');
+
+      const inervalId = setInterval(() => {
+        const currentTime = Date.now();
+        isActive = true;
+        referenceTime = currentTime - selectedTime;
+
+        const { days, hours, minutes, seconds } = convertMs(referenceTime * -1);
+
+        refs.daysField.textContent = pad(days);
+        refs.hoursField.textContent = pad(hours);
+        refs.minutesField.textContent = pad(minutes);
+        refs.secondsField.textContent = pad(seconds);
+
+        if (referenceTime >= -1000) {
+          isActive = false;
+          clearInterval(inervalId);
+        }
+      }, 1000);
+    });
   },
 };
-
-function onStartBtnClick(selectedTime) {
-  const inervalId = setInterval(() => {
-    const currentTime = Date.now();
-    referenceTime = currentTime - selectedTime;
-
-    const { days, hours, minutes, seconds } = convertMs(referenceTime * -1);
-
-    refs.daysField.textContent = days;
-    refs.hoursField.textContent = hours;
-    refs.minutesField.textContent = minutes;
-    refs.secondsField.textContent = seconds;
-    if ((referenceTime = 0)) {
-      clearInterval(intervalId);
-    }
-  }, 1000);
-}
 
 const fp = flatpickr(refs.input, options);
 
@@ -71,4 +88,7 @@ function convertMs(ms) {
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
+}
+function pad(value) {
+  return String(value).padStart(2, '0');
 }
