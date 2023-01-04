@@ -11,20 +11,38 @@ function onFormSubmit(evt) {
   evt.preventDefault();
   const { delay, step, amount } = evt.currentTarget;
 
-  for (i = 0; i < Number(amount.value); i += 1) {
-    createPromise((i += 1), Number(delay.value), Number(step.value));
+  const firstDelay = delay.valueAsNumber;
+  const userStep = step.valueAsNumber;
+  const userAmount = amount.valueAsNumber;
+
+  promisesCounter(firstDelay, userStep, userAmount);
+}
+
+function createPromise(position, delay) {
+  return new Promise((resolve, reject) => {
+    const shouldResolve = Math.random() > 0.3;
+    setTimeout(() => {
+      if (shouldResolve) {
+        resolve({ position, delay });
+      }
+      reject({ position, delay });
+    }, delay);
+  });
+}
+
+function promisesCounter(delay, step, amount) {
+  for (i = 0; i < amount; i += 1) {
+    const userDelay = delay + step * i;
+    createPromise(i + 1, userDelay)
+      .then(onPromiseSuccess)
+      .catch(onPromiseError);
   }
 }
 
-function createPromise(position, delay, step) {
-  const shouldResolve = Math.random() > 0.3;
-  const promise = new Promise((resolve, reject) => {
-    if (shouldResolve) {
-      console.log(' resolve position', position);
-    } else {
-      console.log('reject');
-      console.log(' reject position', position);
-      console.log('reject delay', delay);
-    }
-  });
+function onPromiseSuccess({ position, delay }) {
+  Notiflix.Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+}
+
+function onPromiseError({ position, delay }) {
+  Notiflix.Notify.failure(`❌Rejected promise ${position} in ${delay}ms`);
 }

@@ -25,51 +25,65 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
     if (selectedDates[0] < currentDate) {
-      makeDisabledBtn();
+      makeDisabledBtn(true);
 
       Notiflix.Notify.failure('Please choose a date in the future');
       return;
     }
-
-    takeOfDisabledBtn();
+    makeDisabledBtn(false);
 
     const selectedTime = selectedDates[0].getTime();
 
     refs.startBtn.addEventListener('click', () => {
-      if (isActive) {
-        Notiflix.Notify.info('Sorry timer started!');
-        return;
-      }
-      Notiflix.Notify.success('Date entered correctly. Timer started!');
-
-      const inervalId = setInterval(() => {
-        isActive = true;
-        referenceTime = currentDate - selectedTime;
-
-        const { days, hours, minutes, seconds } = convertMs(referenceTime * -1);
-
-        refs.daysField.textContent = pad(days);
-        refs.hoursField.textContent = pad(hours);
-        refs.minutesField.textContent = pad(minutes);
-        refs.secondsField.textContent = pad(seconds);
-
-        if (referenceTime >= -1000) {
-          Notiflix.Notify.success('The timer has finished!');
-          isActive = false;
-          clearInterval(inervalId);
-        }
-      }, 1000);
+      onBtnClick(selectedTime);
     });
   },
 };
 
+function onBtnClick(selectedTime) {
+  if (isActive) {
+    return;
+  }
+  Notiflix.Notify.success('Date entered correctly. Timer started!');
+
+  makeDisabledBtn(true);
+
+  makeDisabledInput(true);
+
+  const inervalId = setInterval(() => {
+    isActive = true;
+    const currentTime = Date.now();
+
+    const referenceTime = currentTime - selectedTime;
+
+    const { days, hours, minutes, seconds } = convertMs(referenceTime * -1);
+
+    makeMarkupTextContent(days, hours, minutes, seconds);
+
+    if (referenceTime >= -1000) {
+      Notiflix.Notify.success('The timer has finished!');
+      isActive = false;
+      makeDisabledInput(false);
+      clearInterval(inervalId);
+    }
+  }, 1000);
+}
+
 const fp = flatpickr(refs.input, options);
 
-function makeDisabledBtn() {
-  refs.startBtn.disabled = true;
+function makeMarkupTextContent(days, hours, minutes, seconds) {
+  refs.daysField.textContent = pad(days);
+  refs.hoursField.textContent = pad(hours);
+  refs.minutesField.textContent = pad(minutes);
+  refs.secondsField.textContent = pad(seconds);
 }
-function takeOfDisabledBtn() {
-  refs.startBtn.disabled = false;
+
+function makeDisabledBtn(boolean) {
+  refs.startBtn.disabled = boolean;
+}
+
+function makeDisabledInput(boolean) {
+  refs.input.disabled = boolean;
 }
 
 function convertMs(ms) {
