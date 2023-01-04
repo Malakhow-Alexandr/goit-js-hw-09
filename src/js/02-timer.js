@@ -24,12 +24,10 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    
     if (selectedDates[0] < currentDate) {
       makeDisabledBtn();
 
       Notiflix.Notify.failure('Please choose a date in the future');
-
       return;
     }
 
@@ -45,9 +43,8 @@ const options = {
       Notiflix.Notify.success('Date entered correctly. Timer started!');
 
       const inervalId = setInterval(() => {
-        const currentTime = Date.now();
         isActive = true;
-        referenceTime = currentTime - selectedTime;
+        referenceTime = currentDate - selectedTime;
 
         const { days, hours, minutes, seconds } = convertMs(referenceTime * -1);
 
@@ -58,7 +55,6 @@ const options = {
 
         if (referenceTime >= -1000) {
           Notiflix.Notify.success('The timer has finished!');
-          
           isActive = false;
           clearInterval(inervalId);
         }
