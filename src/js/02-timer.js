@@ -57,6 +57,8 @@ const options = {
         refs.secondsField.textContent = pad(seconds);
 
         if (referenceTime >= -1000) {
+          Notiflix.Notify.success('The timer has finished!');
+          
           isActive = false;
           clearInterval(inervalId);
         }
