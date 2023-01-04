@@ -31,7 +31,7 @@ function createPromise(position, delay) {
 }
 
 function promisesCounter(delay, step, amount) {
-  for (i = 0; i < amount; i += 1) {
+  for (let i = 0; i < amount; i += 1) {
     const userDelay = delay + step * i;
     createPromise(i + 1, userDelay)
       .then(onPromiseSuccess)
